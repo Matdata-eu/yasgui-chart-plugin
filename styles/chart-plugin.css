@@ -1,4 +1,6 @@
 .yasgui-chart-plugin {
+  /* Lets the browser draw native dropdown lists in the matching theme */
+  color-scheme: light;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -11,6 +13,10 @@
   padding: 40px;
   text-align: center;
   color: var(--chart-text-muted);
+}
+
+[data-theme='dark'] .yasgui-chart-plugin {
+  color-scheme: dark;
 }
 
 /* Toolbar */
