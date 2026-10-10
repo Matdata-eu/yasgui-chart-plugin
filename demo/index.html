@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<!--
+  YASGUI Chart Plugin - demo
+
+  A full Yasgui with the chart plugin registered. Run queries against the
+  endpoint, or load one of the sample results to try the chart without a
+  SPARQL endpoint.
+  Run locally with: npm run dev
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>YASGUI Chart Plugin Demo</title>
+  </head>
+  <body>
+    <header class="demo-header">
+      <h1>YASGUI Chart Plugin</h1>
+      <p>
+        Visualise SELECT results as bar, line, area, pie, scatter and histogram charts. Load a sample
+        result or run a query, then open the <strong>Chart</strong> tab. Ctrl+click a bar or slice to
+        see the triples of its IRI.
+      </p>
+      <div class="demo-controls" id="samples"></div>
+    </header>
+    <div id="yasgui"></div>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
