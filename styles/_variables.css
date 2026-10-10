@@ -1,11 +1,12 @@
 /* Colours follow the YASGUI theme variables, with fallbacks for standalone use */
+/* --yasgui-button-hover is a text/icon colour in Yasgui (black in light mode), so hover backgrounds use --yasgui-bg-tertiary */
 :root {
   --chart-background: var(--yasgui-bg-primary, #ffffff);
   --chart-surface: var(--yasgui-bg-secondary, #f5f5f5);
   --chart-text: var(--yasgui-text-primary, #222222);
   --chart-text-muted: var(--yasgui-text-secondary, #666666);
   --chart-border: var(--yasgui-border-color, #d0d0d0);
-  --chart-control-hover: var(--yasgui-button-hover, #e8e8e8);
+  --chart-control-hover: var(--yasgui-bg-tertiary, #eeeeee);
   --chart-primary: var(--yasgui-accent-color, #1976d2);
   --chart-primary-hover: var(--yasgui-accent-color-hover, #1565c0);
   --chart-uri-color: var(--yasgui-link-color, var(--yasgui-accent-color, #1976d2));
@@ -17,7 +18,7 @@
   --chart-text: var(--yasgui-text-primary, #e0e0e0);
   --chart-text-muted: var(--yasgui-text-secondary, #aaaaaa);
   --chart-border: var(--yasgui-border-color, #444444);
-  --chart-control-hover: var(--yasgui-button-hover, #3a3a3a);
+  --chart-control-hover: var(--yasgui-bg-tertiary, #21262d);
   --chart-primary: var(--yasgui-accent-color, #6aa6e8);
   --chart-primary-hover: var(--yasgui-accent-color-hover, #8bbbef);
   --chart-uri-color: var(--yasgui-link-color, var(--yasgui-accent-color, #6aa6e8));
