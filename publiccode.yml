@@ -1,0 +1,50 @@
+publiccodeYmlVersion: '0'
+name: YASGUI Chart Plugin
+url: https://github.com/Matdata-eu/yasgui-chart-plugin
+landingURL: https://matdata-eu.github.io/yasgui-chart-plugin/
+softwareVersion: 1.0.0
+releaseDate: '2026-10-10'
+platforms:
+- web
+categories:
+- data-visualization
+- data-analytics
+- business-intelligence
+developmentStatus: stable
+softwareType: addon
+organisation:
+  uri: https://matdata.eu
+  name: Matdata
+intendedAudience:
+  scope:
+  - government
+  - science-and-technology
+  - infrastructures
+  - transportation
+description:
+  en:
+    shortDescription: Turns SPARQL SELECT results into bar, line, area, pie, scatter or histogram charts
+      in YASGUI.
+    longDescription: |
+      This plugin turns the result of a SPARQL SELECT query into a chart without leaving the query editor. It picks a fitting chart type from the result's columns: a label column with numbers gives a bar chart, a date column a line chart, two numeric columns a scatter plot.
+
+      Users can switch between bar, stacked bar, line, area, pie, donut, scatter and histogram charts, choose the columns, and export the chart as PNG or SVG. It is built on Apache ECharts and works in YASGUI and in MatGUI, where it is included by default.
+    documentation: https://github.com/Matdata-eu/yasgui-chart-plugin#readme
+    features:
+    - Bar, line, area, pie, donut, scatter and histogram charts
+    - Automatic chart type from the result's columns
+    - Series from long-format results
+    - Export as PNG or SVG
+    - Light and dark theme
+legal:
+  license: Apache-2.0
+  mainCopyrightOwner: Matdata
+maintenance:
+  type: internal
+  contacts:
+  - name: Mathias Vanden Auweele
+    affiliation: Matdata
+localisation:
+  localisationReady: false
+  availableLanguages:
+  - en
