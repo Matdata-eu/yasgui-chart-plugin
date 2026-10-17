@@ -23,6 +23,8 @@ export interface ToolbarCallbacks {
   onChange: (settings: ChartSettings) => void;
   onReset: () => void;
   onExport: (format: 'png' | 'svg') => void;
+  /** Show IRIs as prefixed names (true) or in full (false) */
+  onShortenIris: (shortenIris: boolean) => void;
 }
 
 export interface ToolbarState {
@@ -30,6 +32,8 @@ export interface ToolbarState {
   resolved: ResolvedChartSettings;
   /** True when the user has saved choices (so "Auto" can reset them) */
   customised: boolean;
+  /** IRIs are shown as prefixed names */
+  shortenIris: boolean;
 }
 
 const KIND_LABEL: Record<string, string> = {
@@ -257,6 +261,12 @@ export function renderToolbar(state: ToolbarState, callbacks: ToolbarCallbacks):
   spacer.className = 'chart-toolbar-spacer';
   toolbar.appendChild(spacer);
 
+  const shorten = button('chart-shorten-iris', 'Prefixes', 'Show IRIs as prefixed names', () =>
+    callbacks.onShortenIris(!state.shortenIris)
+  );
+  shorten.setAttribute('aria-pressed', String(state.shortenIris));
+  toolbar.appendChild(shorten);
+
   toolbar.appendChild(
     button('chart-export-png', 'PNG', 'Download the chart as a PNG image', () =>
       callbacks.onExport('png')
@@ -333,6 +343,16 @@ function renderViewSettings(state: ToolbarState, callbacks: ToolbarCallbacks): H
   );
   reset.disabled = !state.customised;
   menu.appendChild(reset);
+  const shorten = menuItem(
+    'chart-shorten-iris',
+    state.shortenIris ? 'square-check' : 'square',
+    'Shorten IRIs with prefixes',
+    'Show IRIs as prefixed names, such as ex:Germany',
+    run(() => callbacks.onShortenIris(!state.shortenIris))
+  );
+  shorten.setAttribute('role', 'menuitemcheckbox');
+  shorten.setAttribute('aria-checked', String(state.shortenIris));
+  menu.appendChild(shorten);
   const separator = document.createElement('div');
   separator.className = 'chart-view-settings-separator';
   separator.setAttribute('role', 'separator');

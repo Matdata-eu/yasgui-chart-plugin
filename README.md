@@ -13,7 +13,7 @@ A YASGUI (YASR) plugin that visualises SPARQL **SELECT** results as charts: bar 
 - **🪄 Automatic choice**: a label/IRI column plus numbers gives a bar chart, a date column plus numbers a line chart, numbers against numbers a scatter plot, and a single numeric column a histogram
 - **🎛️ Controls**: pick the chart type and the category, value and series columns. The choice is saved per tab; a different query (other variables) starts from the automatic chart again
 - **🧮 Long results**: a second category-like column (e.g. `?country ?type ?count`) is split into series automatically; rows that repeat a category are summed
-- **🏷️ Readable labels**: IRIs are shown with their label column (`?x` with `?xLabel`) or as prefixed names
+- **🏷️ Readable labels**: IRIs are shown with their label column (`?x` with `?xLabel`) or as prefixed names (can be turned off)
 - **🔎 Ctrl+click describe**: Ctrl+click a bar, slice or point to see the triples of its IRI (Ctrl+Shift+click for the triples where it is the object). Newer MatGUI versions show them in the shared describe panel; older YASR versions get the plugin's own modal, the same as the table and geo plugins
 - **🌓 Light and dark theme**: follows the YASGUI theme and switches live. The first series uses the theme's brand colour (`--yasgui-brand`) and the hovered item the highlight colour (`--yasgui-highlight`), with MatData blue and amber as fallbacks
 - **🖼️ Export**: download the chart as PNG or SVG
@@ -80,9 +80,10 @@ ORDER BY DESC(?operationalPoints)
 | **Values** / **Size** | Numeric column(s) to plot; pie, donut and histogram use one |
 | **Series** | Column whose values split the data into series (grouped or stacked bars, several lines) |
 | **Automatic chart** (**Auto**) | Go back to the automatic chart for these results |
+| **Shorten IRIs with prefixes** (**Prefixes**) | On by default: IRIs without a label column show as prefixed names (`ex:Germany`), using the query's prefixes and a few well-known ones such as `wd:` and `rdfs:`. Turn it off to see the full IRIs |
 | **Download PNG** / **Download SVG** (**PNG** / **SVG**) | Download the chart |
 
-In newer MatGUI versions the pickers sit in the shared plugin toolbar under the results header, and the automatic chart and downloads are in the **View settings** menu at the far right. With older YASR versions the plugin draws its own toolbar above the chart, with **Auto**, **PNG** and **SVG** buttons.
+In newer MatGUI versions the pickers sit in the shared plugin toolbar under the results header, and the automatic chart, IRI shortening and downloads are in the **View settings** menu at the far right. With older YASR versions the plugin draws its own toolbar above the chart, with **Auto**, **Prefixes**, **PNG** and **SVG** buttons.
 
 The YASR download button also saves the chart as PNG.
 

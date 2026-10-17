@@ -108,6 +108,12 @@ describe('settingsForColumns', () => {
     expect(settingsForColumns({ chartType: 'pie', columns: ['a', 'b'] }, ['a', 'c'])).toEqual({});
   });
 
+  it('keeps display options for other variables', () => {
+    expect(
+      settingsForColumns({ chartType: 'pie', shortenIris: false, columns: ['a', 'b'] }, ['a', 'c'])
+    ).toEqual({ shortenIris: false });
+  });
+
   it('keeps choices saved without variables', () => {
     expect(settingsForColumns({ chartType: 'pie' }, ['x'])).toEqual({ chartType: 'pie' });
   });
