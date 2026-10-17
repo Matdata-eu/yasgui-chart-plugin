@@ -36,6 +36,27 @@ export interface PluginQueryOptions {
   signal?: AbortSignal;
 }
 
+/**
+ * Features a YASR host offers to plugins (MatGUI yasr host API, version 1).
+ * Absent on older YASR versions: plugins feature-detect it, never a version string.
+ */
+export interface YasrHostApi {
+  version: number;
+  /** `yasr.describe()` opens the shared describe panel */
+  describe?: boolean;
+  /** `yasr.getPluginToolbar()` returns the shared toolbar slot */
+  toolbar?: boolean;
+}
+
+/** Options for the host's shared describe panel */
+export interface YasrDescribeOptions {
+  direction?: 'outgoing' | 'incoming';
+  /** Label of the calling view, shown as "Opened from Chart" */
+  source?: string;
+  /** Start a fresh back/forward history (default true) */
+  newHistory?: boolean;
+}
+
 /** The parts of a YASR instance the chart plugin uses */
 export interface Yasr {
   results: any;
@@ -45,6 +66,11 @@ export interface Yasr {
   getPrefixes?: () => Record<string, string>;
   storePluginConfig?: (pluginName: string, conf: unknown) => void;
   executeQuery?: (query: string, options?: PluginQueryOptions) => Promise<any>;
+  /** Host API (newer YASR only) */
+  hostApi?: YasrHostApi;
+  describe?: (iri: string, options?: YasrDescribeOptions) => Promise<void>;
+  closeDescribe?: () => void;
+  getPluginToolbar?: () => HTMLDivElement;
 }
 
 /** Chart types offered in the chart type picker */
