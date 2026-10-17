@@ -170,22 +170,18 @@
   gap: 8px;
 }
 
+/* The .yasr_toolbarSelect field already draws the box: the summary sits in it
+   like a <select> does, without a border of its own */
 .yasr_toolbarSelect .chart-values-summary {
   box-sizing: border-box;
-  height: 30px;
-  padding: 0 10px;
+  height: 28px;
+  padding: 0 8px 0 0;
   gap: 2px;
-  border: 1px solid var(--yasgui-line-strong, var(--chart-border));
-  border-radius: var(--yasgui-radius-button, 8px);
-  background: var(--yasgui-surface-raised, var(--chart-background));
+  border: none;
+  background: transparent;
   color: var(--yasgui-ink, var(--chart-text));
   font: inherit;
-  font-weight: 500;
   cursor: pointer;
-}
-
-.yasr_toolbarSelect .chart-values-summary:hover {
-  background: var(--yasgui-surface-sunken, var(--chart-control-hover));
 }
 
 .yasr_toolbarSelect .chart-values-summary:focus-visible,
