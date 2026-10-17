@@ -100,6 +100,12 @@ export interface ChartSettings {
   columns?: string[];
   /** Column whose distinct values split the data into series (long format); `""` for none */
   series?: string;
+  /**
+   * Show IRIs as prefixed names (`ex:Germany`) on the axes, legend and
+   * tooltips; `false` shows the full IRIs. Default `true`. A display option:
+   * it is kept for other results and by "Automatic chart".
+   */
+  shortenIris?: boolean;
 }
 
 /** Fully resolved chart choices, after applying the automatic defaults */

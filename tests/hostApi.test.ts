@@ -243,6 +243,46 @@ describe('with the host API', () => {
     expect(yasr.storePluginConfig).toHaveBeenLastCalledWith('Chart', {});
   });
 
+  it('shortens IRIs with prefixes by default and can show them in full', () => {
+    const iris = {
+      head: { vars: ['country', 'population'] },
+      results: {
+        bindings: [
+          {
+            country: { type: 'uri', value: 'http://example.org/Germany' },
+            population: { type: 'literal', value: '83' },
+          },
+          {
+            country: { type: 'uri', value: 'http://www.wikidata.org/entity/Q142' },
+            population: { type: 'literal', value: '68' },
+          },
+        ],
+      },
+    };
+    const { yasr, slot } = makeHostYasr(iris);
+    const plugin = new ChartPlugin(yasr);
+    yasr.plugins.Chart = plugin;
+    plugin.draw();
+    const lastOption = () =>
+      chartInstance.setOption.mock.calls[chartInstance.setOption.mock.calls.length - 1][0];
+    // ex: comes from Yasr, wd: is a well-known prefix
+    expect(lastOption().xAxis.data).toEqual(['ex:Germany', 'wd:Q142']);
+
+    const item = slot.querySelector('.chart-shorten-iris') as HTMLButtonElement;
+    expect(item.getAttribute('aria-checked')).toBe('true');
+    item.click();
+    expect(lastOption().xAxis.data).toEqual([
+      'http://example.org/Germany',
+      'http://www.wikidata.org/entity/Q142',
+    ]);
+    expect(yasr.storePluginConfig).toHaveBeenLastCalledWith('Chart', { shortenIris: false });
+    expect(
+      (slot.querySelector('.chart-shorten-iris') as HTMLButtonElement).getAttribute('aria-checked')
+    ).toBe('false');
+    // A display option, not a chart choice: "Automatic chart" stays off
+    expect((slot.querySelector('.chart-reset-button') as HTMLButtonElement).disabled).toBe(true);
+  });
+
   it('leaves the slot empty when there is nothing to chart', () => {
     const { yasr, slot } = makeHostYasr({ head: { vars: [] }, results: { bindings: [] } });
     new ChartPlugin(yasr).draw();

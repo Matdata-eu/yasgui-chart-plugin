@@ -49,7 +49,18 @@ export function sanitizeSettings(raw: unknown): ChartSettings {
   if (typeof r.series === 'string') settings.series = r.series;
   if (Array.isArray(r.columns))
     settings.columns = r.columns.filter((v): v is string => typeof v === 'string');
+  if (typeof r.shortenIris === 'boolean') settings.shortenIris = r.shortenIris;
   return settings;
+}
+
+/** Whether the user picked chart choices for these results (display options aside) */
+export function isCustomised(saved: ChartSettings): boolean {
+  return Object.keys(saved).some((key) => key !== 'columns' && key !== 'shortenIris');
+}
+
+/** Display options that hold for any results */
+export function displayOptions(saved: ChartSettings): ChartSettings {
+  return saved.shortenIris === undefined ? {} : { shortenIris: saved.shortenIris };
 }
 
 /**
@@ -59,7 +70,7 @@ export function sanitizeSettings(raw: unknown): ChartSettings {
 export function settingsForColumns(saved: ChartSettings, vars: string[]): ChartSettings {
   if (!saved.columns) return saved;
   const same = saved.columns.length === vars.length && saved.columns.every((v, i) => v === vars[i]);
-  return same ? saved : {};
+  return same ? saved : displayOptions(saved);
 }
 
 /** Columns that can serve as the category (x axis): anything but label columns */

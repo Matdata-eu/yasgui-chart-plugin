@@ -20,7 +20,13 @@ import { buildChartOption, iriForClick } from './chartOptions';
 import { closeToolbarPopups, renderHostToolbar, renderToolbar } from './controls';
 import { getHostToolbar, hasHostDescribe } from './host';
 import { iconSvg } from './icons';
-import { resolveSettings, sanitizeSettings, settingsForColumns } from './settings';
+import {
+  displayOptions,
+  isCustomised,
+  resolveSettings,
+  sanitizeSettings,
+  settingsForColumns,
+} from './settings';
 import { getThemeColors, watchThemeChanges } from './theme';
 import { DescribeModal } from './describe/describe-modal';
 import { parseDescribeResponse } from './describe/describe-parser';
@@ -34,6 +40,20 @@ import type {
   SparqlSelectResults,
   Yasr,
 } from './types';
+
+/** Well-known prefixes, so common IRIs are shortened even when the query doesn't declare them */
+const COMMON_PREFIXES: PrefixMap = {
+  rdf: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+  rdfs: 'http://www.w3.org/2000/01/rdf-schema#',
+  owl: 'http://www.w3.org/2002/07/owl#',
+  xsd: 'http://www.w3.org/2001/XMLSchema#',
+  foaf: 'http://xmlns.com/foaf/0.1/',
+  dc: 'http://purl.org/dc/elements/1.1/',
+  dcterms: 'http://purl.org/dc/terms/',
+  skos: 'http://www.w3.org/2004/02/skos/core#',
+  schema: 'http://schema.org/',
+  wd: 'http://www.wikidata.org/entity/',
+};
 
 echarts.use([
   BarChart,
@@ -171,6 +191,15 @@ class ChartPlugin {
     return prefixes;
   }
 
+  /**
+   * Prefixes used to show IRIs in the chart: well-known ones, then those of
+   * Yasr and the query. None when the user turned shortening off.
+   */
+  private getLabelPrefixes(): PrefixMap {
+    if (this.saved.shortenIris === false) return {};
+    return { ...COMMON_PREFIXES, ...this.getPrefixes() };
+  }
+
   /** Build the toolbar and chart for the current results and settings */
   private render(): void {
     if (!this.results) return;
@@ -182,7 +211,7 @@ class ChartPlugin {
     const rows = allRows.length > maxRows ? allRows.slice(0, maxRows) : allRows;
 
     this.resolved = resolveSettings(this.columns, this.saved, rows.length);
-    this.data = buildChartData(rows, this.columns, this.resolved, this.getPrefixes());
+    this.data = buildChartData(rows, this.columns, this.resolved, this.getLabelPrefixes());
 
     const wrapper = document.createElement('div');
     wrapper.className = 'yasgui-chart-plugin';
@@ -190,11 +219,14 @@ class ChartPlugin {
     const toolbarState = {
       columns: this.columns,
       resolved: this.resolved,
-      customised: Object.keys(this.saved).length > 0,
+      customised: isCustomised(this.saved),
+      shortenIris: this.saved.shortenIris !== false,
     };
     const toolbarCallbacks = {
-      onChange: (settings: ChartSettings) => this.updateSettings(settings),
-      onReset: () => this.updateSettings({}),
+      onChange: (settings: ChartSettings) =>
+        this.updateSettings({ ...displayOptions(this.saved), ...settings }),
+      onReset: () => this.updateSettings(displayOptions(this.saved)),
+      onShortenIris: (shortenIris: boolean) => this.updateSettings({ ...this.saved, shortenIris }),
       onExport: (format: 'png' | 'svg') => this.exportImage(format),
     };
     // Newer YASR hosts give plugins a shared toolbar slot; older ones don't
@@ -294,8 +326,7 @@ class ChartPlugin {
 
   private updateSettings(settings: ChartSettings): void {
     this.saved = sanitizeSettings(settings);
-    if (Object.keys(this.saved).length > 0 && this.results)
-      this.saved.columns = [...this.results.head.vars];
+    if (isCustomised(this.saved) && this.results) this.saved.columns = [...this.results.head.vars];
     if (typeof this.yasr.storePluginConfig === 'function') {
       try {
         this.yasr.storePluginConfig(this.getPluginName(), this.saved);

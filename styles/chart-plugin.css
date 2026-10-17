@@ -62,6 +62,11 @@
   background: var(--chart-control-hover);
 }
 
+.chart-toolbar-button[aria-pressed='true'] {
+  border-color: var(--yasgui-brand, #0563bb);
+  color: var(--yasgui-brand, #0563bb);
+}
+
 .chart-toolbar-spacer {
   flex: 1;
 }
