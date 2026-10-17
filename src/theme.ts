@@ -9,10 +9,16 @@ export interface ChartThemeColors {
   border: string;
   background: string;
   tooltipBackground: string;
+  /** Series colours; the first one is the brand colour (`--yasgui-brand`) */
   palette: string[];
+  /** Colour of the highlighted (hovered) item: `--yasgui-highlight` */
+  highlight?: string;
 }
 
-/** Categorical palette, readable on both light and dark backgrounds */
+/**
+ * Categorical palette, readable on both light and dark backgrounds. The first
+ * colour is replaced by the theme's brand colour (data colour role: series 1).
+ */
 const LIGHT_PALETTE = [
   '#2f6fb0',
   '#e07b39',
@@ -39,6 +45,12 @@ const DARK_PALETTE = [
   '#9aa8bb',
 ];
 
+/** MatData brand blue and highlight amber, used when YASGUI doesn't define them */
+const BRAND_LIGHT = '#0563bb';
+const BRAND_DARK = '#5aa8f2';
+const HIGHLIGHT_LIGHT = '#f2b300';
+const HIGHLIGHT_DARK = '#f5c242';
+
 export function getCurrentTheme(): 'light' | 'dark' {
   if (typeof document === 'undefined') return 'light';
   return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
@@ -55,7 +67,11 @@ export function getThemeColors(): ChartThemeColors {
     border: read('--yasgui-border-color', dark ? '#444444' : '#d0d0d0'),
     background: read('--yasgui-bg-primary', dark ? '#1e1e1e' : '#ffffff'),
     tooltipBackground: read('--yasgui-bg-secondary', dark ? '#2a2a2a' : '#ffffff'),
-    palette: dark ? DARK_PALETTE : LIGHT_PALETTE,
+    palette: [
+      read('--yasgui-brand', dark ? BRAND_DARK : BRAND_LIGHT),
+      ...(dark ? DARK_PALETTE : LIGHT_PALETTE).slice(1),
+    ],
+    highlight: read('--yasgui-highlight', dark ? HIGHLIGHT_DARK : HIGHLIGHT_LIGHT),
   };
 }
 

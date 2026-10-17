@@ -54,6 +54,13 @@ function baseOption(colors: ChartThemeColors, pointCount: number): Record<string
   };
 }
 
+/** Hover emphasis: the highlighted item takes the highlight colour */
+function emphasis(colors: ChartThemeColors, focusSeries: boolean): Record<string, any> {
+  const result: Record<string, any> = focusSeries ? { focus: 'series' } : {};
+  if (colors.highlight) result.itemStyle = { color: colors.highlight };
+  return result;
+}
+
 function axisStyle(colors: ChartThemeColors) {
   return {
     axisLine: { lineStyle: { color: colors.border } },
@@ -106,6 +113,7 @@ function categoryOption(
         center: ['50%', '55%'],
         avoidLabelOverlap: true,
         itemStyle: { borderColor: colors.background, borderWidth: 1 },
+        emphasis: emphasis(colors, false),
         label: { color: colors.text, formatter: '{b}: {d}%' },
         data: data.categories
           // Slices keep their category index: empty and negative values are dropped
@@ -192,7 +200,7 @@ function categoryOption(
     areaStyle: settings.chartType === 'area' ? { opacity: 0.25 } : undefined,
     connectNulls: isLine,
     showSymbol: isLine && labels.length <= 100,
-    emphasis: { focus: 'series' },
+    emphasis: isLine ? { focus: 'series' } : emphasis(colors, true),
     large: !isLine && labels.length > 1000,
   }));
   return option;
@@ -249,7 +257,7 @@ function xyOption(
     symbolSize: scatter ? 8 : 4,
     showSymbol: !scatter && s.points.length <= 100,
     areaStyle: settings.chartType === 'area' ? { opacity: 0.25 } : undefined,
-    emphasis: { focus: 'series' },
+    emphasis: scatter ? emphasis(colors, true) : { focus: 'series' },
     large: scatter && s.points.length > 2000,
   }));
   return option;
@@ -283,7 +291,13 @@ function histogramOption(data: HistogramData, colors: ChartThemeColors): Record<
     return `${escapeHtml(data.column)}: ${escapeHtml(labels[p.dataIndex])}<br/>Count: <strong>${formatNumber(p.value)}</strong>`;
   };
   option.series = [
-    { type: 'bar', name: 'Count', data: data.bins.map((b) => b.count), barCategoryGap: '4%' },
+    {
+      type: 'bar',
+      name: 'Count',
+      data: data.bins.map((b) => b.count),
+      barCategoryGap: '4%',
+      emphasis: emphasis(colors, false),
+    },
   ];
   return option;
 }
