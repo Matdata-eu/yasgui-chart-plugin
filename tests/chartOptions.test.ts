@@ -47,6 +47,17 @@ describe('buildChartOption', () => {
     expect(option.legend.show).toBe(false);
   });
 
+  it('colours the hovered item with the highlight colour when there is one', () => {
+    const { chartData, settings, option } = setup(lengthPerCategory);
+    expect(option.series[0].emphasis).toEqual({ focus: 'series' });
+    const highlighted = buildChartOption(chartData, settings, { ...colors, highlight: '#f2b300' });
+    expect(highlighted.color).toEqual(['#111', '#222']);
+    expect(highlighted.series[0].emphasis).toEqual({
+      focus: 'series',
+      itemStyle: { color: '#f2b300' },
+    });
+  });
+
   it('stacks bars and shows a legend for several series', () => {
     const { option } = setup(pointsPerCountryAndType, { chartType: 'stacked-bar' });
     expect(option.series.map((s: any) => s.stack)).toEqual(['total', 'total']);
