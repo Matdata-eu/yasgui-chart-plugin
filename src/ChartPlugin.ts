@@ -17,7 +17,9 @@ import type { ColumnInfo } from './columns';
 import { buildChartData } from './dataModel';
 import type { ChartData } from './dataModel';
 import { buildChartOption, iriForClick } from './chartOptions';
-import { renderToolbar } from './controls';
+import { closeToolbarPopups, renderHostToolbar, renderToolbar } from './controls';
+import { getHostToolbar, hasHostDescribe } from './host';
+import { iconSvg } from './icons';
 import { resolveSettings, sanitizeSettings, settingsForColumns } from './settings';
 import { getThemeColors, watchThemeChanges } from './theme';
 import { DescribeModal } from './describe/describe-modal';
@@ -49,9 +51,7 @@ echarts.use([
 const DEFAULT_MAX_ROWS = 5000;
 const MIN_CHART_HEIGHT = 320;
 
-const ICON_SVG =
-  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">' +
-  '<path fill="currentColor" d="M3 3h2v16h16v2H3V3zm4 10h3v5H7v-5zm5-6h3v11h-3V7zm5 3h3v8h-3v-8z"/></svg>';
+const ICON_SVG = iconSvg('chart-column');
 
 class ChartPlugin {
   /** Below the table (10), so SELECT results still open in the table */
@@ -74,6 +74,9 @@ class ChartPlugin {
   private outsideClickHandler: ((e: MouseEvent) => void) | null = null;
   private windowResizeHandler: (() => void) | null = null;
   private fullscreenObserver: MutationObserver | null = null;
+  /** Elements this plugin put in the host's toolbar slot */
+  private hostToolbarNodes: HTMLElement[] = [];
+  /** @deprecated Own describe modal, used only when the host has no shared describe panel */
   private describeModal: DescribeModal | null = null;
   private describeAbortController: AbortController | null = null;
 
@@ -184,20 +187,24 @@ class ChartPlugin {
     const wrapper = document.createElement('div');
     wrapper.className = 'yasgui-chart-plugin';
 
-    wrapper.appendChild(
-      renderToolbar(
-        {
-          columns: this.columns,
-          resolved: this.resolved,
-          customised: Object.keys(this.saved).length > 0,
-        },
-        {
-          onChange: (settings) => this.updateSettings(settings),
-          onReset: () => this.updateSettings({}),
-          onExport: (format) => this.exportImage(format),
-        }
-      )
-    );
+    const toolbarState = {
+      columns: this.columns,
+      resolved: this.resolved,
+      customised: Object.keys(this.saved).length > 0,
+    };
+    const toolbarCallbacks = {
+      onChange: (settings: ChartSettings) => this.updateSettings(settings),
+      onReset: () => this.updateSettings({}),
+      onExport: (format: 'png' | 'svg') => this.exportImage(format),
+    };
+    // Newer YASR hosts give plugins a shared toolbar slot; older ones don't
+    const slot = getHostToolbar(this.yasr);
+    if (slot) {
+      this.hostToolbarNodes = renderHostToolbar(slot, toolbarState, toolbarCallbacks);
+    } else {
+      wrapper.classList.add('chart-own-toolbar');
+      wrapper.appendChild(renderToolbar(toolbarState, toolbarCallbacks));
+    }
 
     const notes: string[] = [];
     if (allRows.length > maxRows) {
@@ -256,11 +263,9 @@ class ChartPlugin {
 
     this.themeObserver = watchThemeChanges(() => this.applyOption());
 
+    const popupRoot: ParentNode = slot || wrapper;
     this.outsideClickHandler = (e: MouseEvent) => {
-      const picker = wrapper.querySelector('.chart-values-picker');
-      if (picker && picker.hasAttribute('open') && !picker.contains(e.target as Node)) {
-        picker.removeAttribute('open');
-      }
+      closeToolbarPopups(popupRoot, e.target as Node | null);
     };
     document.addEventListener('mousedown', this.outsideClickHandler);
   }
@@ -310,17 +315,41 @@ class ChartPlugin {
   }
 
   /**
-   * Run a background query for the triples where `iri` is the subject (or
-   * object) and show them in the describe modal, as the table and geo plugins do.
+   * Show the triples of `uri`: in the host's shared describe panel when YASR
+   * offers one, otherwise in the plugin's own describe modal.
    */
-  private async runResourceQuery(
+  private runResourceQuery(uri: string, direction: ResourceDirection): void {
+    if (hasHostDescribe(this.yasr)) {
+      const hostDirection = direction === 'object' ? 'incoming' : 'outgoing';
+      const fail = (error: unknown) =>
+        console.error('yasgui-chart-plugin: describe failed', uri, error);
+      try {
+        Promise.resolve(
+          this.yasr.describe!(uri, { direction: hostDirection, source: 'Chart' })
+        ).catch(fail);
+      } catch (error) {
+        fail(error);
+      }
+      return;
+    }
+    void this.runOwnResourceQuery(uri, direction);
+  }
+
+  /**
+   * Run a background query for the triples where `iri` is the subject (or
+   * object) and show them in the plugin's own describe modal.
+   *
+   * @deprecated Fallback for YASR versions without `yasr.describe()`; it will be
+   * removed in the next major version.
+   */
+  private async runOwnResourceQuery(
     uri: string,
     direction: ResourceDirection,
     newHistory = true
   ): Promise<void> {
     if (!this.describeModal) {
       this.describeModal = new DescribeModal({
-        onDescribe: (u, d) => this.runResourceQuery(u, d, false),
+        onDescribe: (u, d) => this.runOwnResourceQuery(u, d, false),
       });
     }
     if (typeof this.yasr.executeQuery !== 'function') {
@@ -446,6 +475,9 @@ class ChartPlugin {
       this.chart.dispose();
       this.chart = null;
     }
+    // Remove only what this plugin added: the slot belongs to YASR
+    for (const node of this.hostToolbarNodes) node.remove();
+    this.hostToolbarNodes = [];
     this.chartEl = null;
     this.option = null;
   }

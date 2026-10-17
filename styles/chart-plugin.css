@@ -85,8 +85,14 @@
   display: none;
 }
 
-.chart-values-picker summary::after {
-  content: '▾';
+.chart-values-summary-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chart-values-picker summary .chart-icon {
+  flex-shrink: 0;
   margin-left: 6px;
   color: var(--chart-text-muted);
 }
@@ -144,4 +150,109 @@
   font-size: 11px;
   font-style: italic;
   opacity: 0.7;
+}
+
+/* Lucide icons */
+.chart-icon {
+  display: block;
+  flex-shrink: 0;
+}
+
+/*
+ * Controls in the YASR host's plugin toolbar slot (.yasr_pluginToolbar).
+ * The host styles .yasr_toolbarSelect, .yasr_toolbarButton and friends; these
+ * rules only cover the chart's own pieces (values picker, view settings menu).
+ */
+.yasr_toolbarGroup.chart-toolbar-pickers {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.yasr_toolbarSelect .chart-values-summary {
+  box-sizing: border-box;
+  height: 30px;
+  padding: 0 10px;
+  gap: 2px;
+  border: 1px solid var(--yasgui-line-strong, var(--chart-border));
+  border-radius: var(--yasgui-radius-button, 8px);
+  background: var(--yasgui-surface-raised, var(--chart-background));
+  color: var(--yasgui-ink, var(--chart-text));
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.yasr_toolbarSelect .chart-values-summary:hover {
+  background: var(--yasgui-surface-sunken, var(--chart-control-hover));
+}
+
+.yasr_toolbarSelect .chart-values-summary:focus-visible,
+.chart-view-settings-item:focus-visible {
+  outline: 2px solid var(--yasgui-focus, #044a8c);
+  outline-offset: 2px;
+}
+
+.yasr_toolbarSelect .chart-values-list {
+  border-color: var(--yasgui-line, var(--chart-border));
+  border-radius: var(--yasgui-radius-md, 10px);
+  background: var(--yasgui-surface-raised, var(--chart-background));
+  box-shadow: var(--yasgui-shadow-raised, 0 4px 12px rgba(0, 0, 0, 0.2));
+}
+
+.chart-view-settings {
+  position: relative;
+  display: inline-flex;
+}
+
+.chart-view-settings-menu {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 4px);
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+  padding: 4px;
+  border: 1px solid var(--yasgui-line, var(--chart-border));
+  border-radius: var(--yasgui-radius-md, 10px);
+  background: var(--yasgui-surface-raised, var(--chart-background));
+  color: var(--yasgui-ink, var(--chart-text));
+  box-shadow: var(--yasgui-shadow-raised, 0 4px 12px rgba(0, 0, 0, 0.2));
+}
+
+.chart-view-settings-menu[hidden] {
+  display: none;
+}
+
+.chart-view-settings-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 7px 10px;
+  border: none;
+  border-radius: var(--yasgui-radius-sm, 6px);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.chart-view-settings-item:hover:not(:disabled) {
+  background: var(--yasgui-brand-soft, var(--chart-control-hover));
+}
+
+.chart-view-settings-item:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.chart-view-settings-separator {
+  height: 1px;
+  margin: 4px 6px;
+  background: var(--yasgui-line, var(--chart-border));
 }

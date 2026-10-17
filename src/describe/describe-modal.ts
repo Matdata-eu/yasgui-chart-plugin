@@ -10,11 +10,18 @@
  * URIs in the triples table can be Ctrl+clicked to describe them in turn. The
  * modal keeps those hops in a history that its back, forward and back-to-start
  * buttons (and Alt+←/→) walk through, like a browser.
+ *
+ * @deprecated The plugin opens IRIs in the YASR host's shared describe panel
+ * (`yasr.describe()`) when the host offers one. This modal is only the
+ * fallback for YASR versions without it and will be removed in the next major
+ * version.
  */
 
 import { DescribeParseResult, DescribeTriple, formatDescribeObject } from './describe-parser';
 import { PrefixMap } from '../types';
 import { ResourceDirection, directionLabel, toPrefixedName } from './resource-query';
+import { icon } from '../icons';
+import type { IconName } from '../icons';
 
 /** How the modal should present the query it is showing. */
 export interface DescribeModalView {
@@ -41,6 +48,10 @@ export interface DescribeModalCallbacks {
   onDescribe?: (uri: string, direction: ResourceDirection) => void;
 }
 
+/**
+ * @deprecated Fallback for YASR versions without `yasr.describe()`; will be
+ * removed in the next major version.
+ */
 export class DescribeModal {
   private backdrop: HTMLElement | null = null;
   private modal: HTMLElement | null = null;
@@ -192,7 +203,8 @@ export class DescribeModal {
 
     const closeButton = document.createElement('button');
     closeButton.className = 'chart-modal-close';
-    closeButton.innerHTML = '&times;';
+    closeButton.type = 'button';
+    closeButton.appendChild(icon('x', 20));
     closeButton.setAttribute('aria-label', 'Close modal');
     closeButton.addEventListener('click', () => this.close());
 
@@ -223,7 +235,7 @@ export class DescribeModal {
 
     const copyButton = document.createElement('button');
     copyButton.className = 'chart-modal-button';
-    copyButton.textContent = 'Copy Raw';
+    copyButton.textContent = 'Copy raw';
     copyButton.addEventListener('click', () => {
       const rawText =
         payload.state === 'results'
@@ -278,7 +290,7 @@ export class DescribeModal {
 
     const button = (
       className: string,
-      text: string,
+      iconName: IconName,
       label: string,
       enabled: boolean,
       onClick: () => void
@@ -286,7 +298,7 @@ export class DescribeModal {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = `chart-describe-modal-nav-button ${className}`;
-      btn.textContent = text;
+      btn.appendChild(icon(iconName));
       btn.title = label;
       btn.setAttribute('aria-label', label);
       btn.disabled = !enabled;
@@ -295,16 +307,22 @@ export class DescribeModal {
     };
 
     nav.appendChild(
-      button('chart-describe-modal-start', '⏮', 'Back to start', this.canGoBack(), () =>
+      button('chart-describe-modal-start', 'chevrons-left', 'Back to start', this.canGoBack(), () =>
         this.backToStart()
       )
     );
     nav.appendChild(
-      button('chart-describe-modal-back', '◀', 'Back (Alt+←)', this.canGoBack(), () => this.back())
+      button('chart-describe-modal-back', 'chevron-left', 'Back (Alt+←)', this.canGoBack(), () =>
+        this.back()
+      )
     );
     nav.appendChild(
-      button('chart-describe-modal-forward', '▶', 'Forward (Alt+→)', this.canGoForward(), () =>
-        this.forward()
+      button(
+        'chart-describe-modal-forward',
+        'chevron-right',
+        'Forward (Alt+→)',
+        this.canGoForward(),
+        () => this.forward()
       )
     );
     return nav;

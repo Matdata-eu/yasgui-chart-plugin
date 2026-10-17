@@ -5,6 +5,10 @@
  * representation that can be rendered in a modal table. Falls back to the raw
  * response text when the response cannot be parsed as SPARQL JSON triples or
  * N-Triples.
+ *
+ * @deprecated Only used by the plugin's own describe modal, the fallback for
+ * YASR versions without the shared describe panel (`yasr.describe()`). Will be
+ * removed in the next major version.
  */
 
 import { YasrBinding } from '../types';

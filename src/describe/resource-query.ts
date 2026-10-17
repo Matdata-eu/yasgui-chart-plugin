@@ -74,6 +74,10 @@ export function toSparqlTerm(uri: string, prefixes: PrefixMap): string {
  * Build the CONSTRUCT query that fetches the triples in which `uri` is the
  * subject or the object. All prefixes from the main query are declared so the
  * query stays readable and servers can use them in their Turtle output.
+ *
+ * @deprecated Only used by the plugin's own describe modal fallback; YASR hosts
+ * with `yasr.describe()` build this query themselves. Will be removed in the
+ * next major version.
  */
 export function buildResourceQuery(
   uri: string,
