@@ -46,7 +46,7 @@
     "n3": "^2.13.11"
   },
   "devDependencies": {
-    "@matdata/yasgui": "^6.6.0",
+    "@matdata/yasgui": "^6.10.0",
     "@types/jest": "^30.0.0",
     "@types/n3": "^1.26.4",
     "@types/node": "^20.19.43",
