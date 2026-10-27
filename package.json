@@ -50,7 +50,7 @@
     "@types/jest": "^30.0.0",
     "@types/n3": "^1.26.4",
     "@types/node": "^20.19.43",
-    "cssnano": "^7.1.9",
+    "cssnano": "^9.6.0",
     "esbuild": "^0.28.2",
     "jest": "^30.5.2",
     "jest-environment-jsdom": "^30.5.2",
