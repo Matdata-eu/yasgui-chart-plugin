@@ -132,7 +132,7 @@ npm run build      # dist/ bundles (ESM, CJS, IIFE), CSS and type declarations
 npm run build:demo # static demo in demo/dist
 ```
 
-The demo is deployed to GitHub Pages on every push to `main`. Publishing a GitHub release publishes the package to npm (version taken from the tag) and attaches the minified bundles to the release.
+The demo shows the plugin in MatGUI's own results pane (Yasr from `@matdata/yasgui`), the way it looks in MatGUI, with sample results to pick from. It is deployed to GitHub Pages on every push to `main`. Publishing a GitHub release publishes the package to npm (version taken from the tag) and attaches the minified bundles to the release.
 
 ## 📄 License
 
