@@ -376,7 +376,7 @@ function renderViewSettings(state: ToolbarState, callbacks: ToolbarCallbacks): H
     )
   );
 
-  toggle.addEventListener('click', () => setOpen(menu.hidden));
+  toggle.addEventListener('click', () => setOpen(Boolean(menu.hidden)));
   wrapper.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !menu.hidden) {
       e.stopPropagation();
