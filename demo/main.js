@@ -1,56 +1,62 @@
-import '@matdata/yasgui/build/yasgui.min.css';
-import Yasgui from '@matdata/yasgui';
 import ChartPlugin from '@matdata/yasgui-chart-plugin';
 import '../styles/index.css';
-import './style.css';
+import { createYasr, setupThemeToggle, showResults, triplesFromSelect } from './demo-host.js';
 import { datasets } from './data.js';
 
-// Register the plugin to Yasr (MatGUI's own build already includes it)
-Yasgui.Yasr.registerPlugin('Chart', ChartPlugin);
+/** Hints on what to try with each dataset */
+const HINTS = {
+  length:
+    'A bar per category. <kbd>Ctrl</kbd>+click a bar to open its IRI in the describe panel; switch the chart type in the toolbar.',
+  countries: 'Two text columns and a number: the chart stacks or groups the types per country.',
+  monthly: 'Dates on the x axis: try a line or area chart.',
+  scatter: 'Two numbers per row: a scatter plot.',
+  histogram: 'One number column: a histogram of its values.',
+};
 
-const COUNTRIES_QUERY = `PREFIX wd: <http://www.wikidata.org/entity/>
-PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+const prefixes = {
+  rdf: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+  rdfs: 'http://www.w3.org/2000/01/rdf-schema#',
+  xsd: 'http://www.w3.org/2001/XMLSchema#',
+  ex: 'http://example.org/',
+  demo: 'http://example.org/demo#',
+};
 
-# Most populous EU member states
-SELECT ?country ?countryLabel ?population WHERE {
-  ?country wdt:P463 wd:Q458 ;
-           wdt:P1082 ?population ;
-           rdfs:label ?countryLabel .
-  FILTER(LANG(?countryLabel) = "en")
-}
-ORDER BY DESC(?population)
-LIMIT 15`;
+// MatGUI registers its own copy as "Chart"; this page shows the one from this repository
+window.Yasgui.Yasr.registerPlugin('Chart', ChartPlugin);
 
-const yasgui = new Yasgui(document.getElementById('yasgui'), {
-  requestConfig: { endpoint: 'https://query.wikidata.org/sparql' },
-  copyEndpointOnNewTab: true,
-  yasqe: { value: COUNTRIES_QUERY },
-  yasr: {
-    pluginOrder: ['Table', 'response', 'Chart'],
-    defaultPlugin: 'Chart',
-  },
+setupThemeToggle(document.getElementById('theme-toggle'));
+
+const keys = Object.keys(datasets);
+const params = new URLSearchParams(window.location.search);
+let current = datasets[params.get('dataset')] ? params.get('dataset') : keys[0];
+
+const yasr = createYasr(document.getElementById('yasr'), {
+  plugin: 'Chart',
+  getPrefixes: () => prefixes,
+  getTriples: () => triplesFromSelect(datasets[current].results),
 });
 
-/** Show sample results in the current tab without querying an endpoint */
-function loadSample(name) {
-  const yasr = yasgui.getTab().getYasr();
-  yasr.setResponse({
-    data: JSON.stringify(datasets[name].results),
-    contentType: 'application/sparql-results+json',
-    status: 200,
-    executionTime: 1,
-  });
-  yasr.selectPlugin('Chart');
+const select = document.getElementById('dataset');
+const hint = document.getElementById('dataset-hint');
+for (const key of keys) {
+  const option = document.createElement('option');
+  option.value = key;
+  option.textContent = `${datasets[key].label} (${datasets[key].results.results.bindings.length} rows)`;
+  select.appendChild(option);
 }
 
-const samples = document.getElementById('samples');
-for (const [name, dataset] of Object.entries(datasets)) {
-  const button = document.createElement('button');
-  button.type = 'button';
-  button.textContent = dataset.label;
-  button.addEventListener('click', () => loadSample(name));
-  samples.appendChild(button);
+function load(key) {
+  current = key;
+  select.value = key;
+  hint.innerHTML = HINTS[key] || '';
+  yasr.closeDescribe?.();
+  showResults(yasr, datasets[key].results);
+  const url = new URL(window.location.href);
+  url.searchParams.set('dataset', key);
+  window.history.replaceState(null, '', url);
 }
 
-window.yasgui = yasgui;
+select.addEventListener('change', () => load(select.value));
+load(current);
+
+window.yasr = yasr;

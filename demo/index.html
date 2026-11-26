@@ -1,29 +1,48 @@
 <!DOCTYPE html>
 <!--
-  YASGUI Chart Plugin - demo
+  Chart plugin demo
 
-  A full Yasgui with the chart plugin registered. Run queries against the
-  endpoint, or load one of the sample results to try the chart without a
-  SPARQL endpoint.
-  Run locally with: npm run dev
+  The chart view as it is in MatGUI: MatGUI's own results pane (Yasr from
+  @matdata/yasgui, with its plugin toolbar, shared describe panel and theme)
+  showing only this plugin, with sample SELECT results to pick from.
+
+  Development: npm run dev
+  Deployed: npm run build:demo
 -->
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>YASGUI Chart Plugin Demo</title>
-  </head>
-  <body>
-    <header class="demo-header">
-      <h1>YASGUI Chart Plugin</h1>
-      <p>
-        Visualise SELECT results as bar, line, area, pie, scatter and histogram charts. Load a sample
-        result or run a query, then open the <strong>Chart</strong> tab. Ctrl+click a bar or slice to
-        see the triples of its IRI.
-      </p>
-      <div class="demo-controls" id="samples"></div>
-    </header>
-    <div id="yasgui"></div>
-    <script type="module" src="./main.js"></script>
-  </body>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chart plugin demo</title>
+  <meta name="description" content="Demo of the MatGUI chart view: SELECT results as bar, line, area, pie, scatter and histogram charts.">
+
+  <!-- MatGUI, with the fonts it expects the page to load -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@matdata/yasgui@6.15.0/build/yasgui.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="./demo.css">
+</head>
+<body>
+  <header class="demo-bar">
+    <div class="demo-brand">
+      <h1><span>Chart</span> plugin</h1>
+      <p>SELECT results as bar, line, area, pie, scatter and histogram charts, shown in MatGUI's results pane.</p>
+    </div>
+    <div class="demo-actions">
+      <label class="demo-field">
+        Dataset
+        <select id="dataset" class="demo-select"></select>
+      </label>
+      <button type="button" id="theme-toggle" class="demo-button">Dark theme</button>
+      <a class="demo-link" href="https://github.com/Matdata-eu/yasgui-chart-plugin">Source</a>
+      <a class="demo-link" href="https://matgui.matdata.eu/">MatGUI</a>
+    </div>
+  </header>
+  <p class="demo-hint" id="dataset-hint"></p>
+  <main class="demo-pane" id="yasr" aria-label="Results"></main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@matdata/yasgui@6.15.0/build/yasgui.min.js"></script>
+  <script type="module" src="./main.js"></script>
+</body>
 </html>
